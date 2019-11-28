@@ -8,6 +8,7 @@ local Actions = {
 	"Moving",
 }
 
+local PS = game:GetService("PathfindingService")
 local V3 = Vector3.new
 
 
@@ -32,9 +33,12 @@ function AI:FindNearestPlayer(Radius)
 	
 	for i = 1, #List do
 		
+		print(Temp)
 		Temp = List[i].Character
+		if Temp == nil then return end
 		
-		if not List[i].Humanoid.Health < 1 then
+		print(type(Temp.Humanoid.Health), type(1))
+		if Temp.Humanoid.Health >= 1 then
 			
 			if (AI.Body.Position - Temp.PrimaryPart.Position).Magnitude <= Dist then
 				
@@ -53,9 +57,38 @@ end
 function AI:Prowl()
 	
 	while AI.Target == nil do
+		print("Searching")
+		AI.Target = AI:FindNearestPlayer(30)
+		print(AI.Target)
+		if AI.Target ~= nil then
+			
+			local path = PS:CreatePath()
+			path:ComputeAsync(AI.Body.Position, AI.Target.PrimaryPart.Position)
+			
+			local waypoints = path:GetWaypoints()
+			
+			for i, marker in pairs(waypoints) do
+				
+				local part = Instance.new("Part")
+				part.Shape = "Ball"
+				part.Material = "Neon"
+				part.Size = Vector3.new(0.6, 0.6, 0.6)
+				part.Position = marker.Position
+				part.Anchored = true
+				part.CanCollide = false
+				part.Parent = game.Workspace
+				
+				
+			end
+			
+		end
 		
+		wait()
 	end
 	
+	
+	AI.Target = nil
+	AI:Prowl()
 end
 
 function AI:ComeToLife(Spawn)
@@ -98,7 +131,9 @@ function AI:ComeToLife(Spawn)
 	
 	AI.Body = Model.PrimaryPart
 	AI.Target = nil
+	AI.SpawnPosition = Spawn.Position
 	
+	AI:Prowl()
 end
 
 
@@ -106,4 +141,3 @@ end
 
 local Npc = AI.new(100, 20, 2)
 Npc:ComeToLife(game.Workspace.Spawn)
-Npc:FindNearestPlayer(30)
