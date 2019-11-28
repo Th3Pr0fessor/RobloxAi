@@ -54,12 +54,26 @@ function AI:FindNearestPlayer(Radius)
 	return Found
 end
 
+
+local Marker = function(Pos)
+	local part = Instance.new("Part")
+	part.Shape = "Ball"
+	part.Material = "Neon"
+	part.Size = Vector3.new(0.6, 0.6, 0.6)
+	part.Position = Pos
+	part.Anchored = true
+	part.CanCollide = false
+	part.Parent = game.Workspace
+	wait(.1)
+	part:Destroy()
+end
+
 function AI:Prowl()
 	
 	while AI.Target == nil do
-		print("Searching")
+		
 		AI.Target = AI:FindNearestPlayer(30)
-		print(AI.Target)
+		
 		if AI.Target ~= nil then
 			
 			local path = PS:CreatePath()
@@ -69,14 +83,9 @@ function AI:Prowl()
 			
 			for i, marker in pairs(waypoints) do
 				
-				local part = Instance.new("Part")
-				part.Shape = "Ball"
-				part.Material = "Neon"
-				part.Size = Vector3.new(0.6, 0.6, 0.6)
-				part.Position = marker.Position
-				part.Anchored = true
-				part.CanCollide = false
-				part.Parent = game.Workspace
+				spawn(function()
+					Marker(marker.Position)
+				end)
 				
 				
 			end
