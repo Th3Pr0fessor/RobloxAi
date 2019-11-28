@@ -82,9 +82,10 @@ function AI:Prowl()
 			
 			for i, marker in pairs(waypoints) do
 				
-				spawn(function()
-					Marker(marker.Position)
-				end)
+--				spawn(function()
+--					Marker(marker.Position)
+--				end)
+				
 				
 				
 			end
