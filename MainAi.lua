@@ -33,18 +33,17 @@ function AI:FindNearestPlayer(Radius)
 	
 	for i = 1, #List do
 		
-		print(Temp)
 		Temp = List[i].Character
 		if Temp == nil then return end
 		
-		print(type(Temp.Humanoid.Health), type(1))
 		if Temp.Humanoid.Health >= 1 then
 			
 			if (AI.Body.Position - Temp.PrimaryPart.Position).Magnitude <= Dist then
 				
 				Dist = (AI.Body.Position - Temp.PrimaryPart.Position).Magnitude
+			else
 				
-				
+				return
 			end
 		end
 	end
