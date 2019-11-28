@@ -54,10 +54,11 @@ function AI:FindNearestPlayer(Radius)
 end
 
 
-local Marker = function(Pos)
+local Marker = function(Pos, i)
 	local part = Instance.new("Part")
 	part.Shape = "Ball"
 	part.Material = "Neon"
+	part.Name = i
 	part.Size = Vector3.new(0.6, 0.6, 0.6)
 	part.Position = Pos
 	part.Anchored = true
@@ -65,6 +66,26 @@ local Marker = function(Pos)
 	part.Parent = game.Workspace
 	wait(.1)
 	part:Destroy()
+end
+
+function AI:Move(DesiredPosition)
+	local Walkspeed = 1/10
+	
+	local DP = DesiredPosition + Vector3.new(0, AI.Size.Y/2, 0)
+	local NewRay = Ray.new(
+			AI.Body.Position,
+			DP
+	)
+	local part, position = workspace:FindPartOnRayWithIgnoreList(NewRay, AI.Body.Parent:GetChildren(), true, false)
+	
+	if part~= nil then
+		
+	else
+		for i = 0, 1, Walkspeed do
+			AI.Body.CFrame = AI.Body.CFrame:lerp(CFrame.new(DP), i)
+			wait()
+		end
+	end
 end
 
 function AI:Prowl()
@@ -76,15 +97,18 @@ function AI:Prowl()
 		if AI.Target ~= nil then
 			
 			local path = PS:CreatePath()
-			path:ComputeAsync(AI.Body.Position, AI.Target.PrimaryPart.Position)
+			path:ComputeAsync((AI.Body.CFrame * CFrame.new(0, 0, -2).Position), AI.Target.PrimaryPart.Position)
 			
 			local waypoints = path:GetWaypoints()
 			
 			for i, marker in pairs(waypoints) do
 				
---				spawn(function()
---					Marker(marker.Position)
---				end)
+				spawn(function()
+					--Marker(marker.Position, i)
+					
+				end)
+				AI:Move(marker.Position)
+				
 				
 				
 				
@@ -95,7 +119,7 @@ function AI:Prowl()
 		wait()
 	end
 	
-	
+	print((AI.Body.Position - AI.Target.PrimaryPart.Position).Magnitude)
 	AI.Target = nil
 	AI:Prowl()
 end
@@ -108,6 +132,7 @@ function AI:ComeToLife(Spawn)
 	Part.Size = AI.Size
 	Part.Parent = Model
 	Part.Name = "Core"
+	Part.Anchored = true
 	
 	Model.PrimaryPart = Part
 	Model:SetPrimaryPartCFrame(Spawn.CFrame * CFrame.new(0,((Spawn.Size.Y/2) + (Part.Size.Y/2)),0))
